@@ -302,3 +302,12 @@ Notes instead of raw code. Use these to implement the same behavior without past
 - Which analytics dimensions should be authoritative for entity ids per section?
 - Should analytics query accept account scope via `context.accountId` only, or also a header?
 - Should date range state move to URL for deep links?
+
+## Autonomous Loop Task Log
+
+Iteration 1 focus: implement feature
+
+Tasks:
+- [x] Add a reusable greeting feature module and route existing `hello*.js` scripts through it.
+- [x] Add minimal local CI scripts (`typecheck`, `lint`, `test`) so the required checks run in this workspace.
+- [x] Add an explicit `build` script so CI build step succeeds in this workspace.
