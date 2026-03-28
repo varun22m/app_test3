@@ -433,6 +433,10 @@ The `gateway_url` in the `org_claw` table uses the short-form cluster DNS. All t
 | Mention delivery tracking | `delivered` flag on `notifications` | Matches crew.md pattern; backend creates rows, dispatcher marks delivered |
 | Priority ordering | urgent > high > medium > low, then created_at ASC | Urgent work surfaces first in the bundle prompt |
 
+## Test19 Workspace Tracking
+
+- [x] Fix local CI linting so CRLF line endings are not misreported as trailing whitespace.
+
 ---
 
 ## 11. OpenClaw Extension Spec — `crew-tasks`

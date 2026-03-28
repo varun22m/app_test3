@@ -22,7 +22,9 @@ Use these files as reference when implementing tasks. Read relevant specs before
 
 **Available specs:**
 
-- `specs/actions-page.md`
+- `specs/accounts-specs.md`
+- `specs/actions-specs.md`
+- `specs/task-dispatcher-specs.md`
 
 ## Critical Rules
 
@@ -140,12 +142,7 @@ Before signaling TASK_COMPLETE:
 
 ## Workflow
 
-1. **Check CI status** - if `## Previous Iteration Errors
-
-**CI checks failed in the previous iteration. You MUST fix these errors.**
-
-Read the error details from: `.ralph-auto/ci_errors.txt`
-` shows errors, fix them first
+1. **Check CI status** - if `` shows errors, fix them first
 2. **Read relevant specs** - understand the focus topic, context, and best practices
 3. **Select a task** - choose one task to work on within the focus topic
 4. **Implement** - follow patterns from specs, implement across all necessary layers
@@ -167,23 +164,15 @@ Read the error details from: `.ralph-auto/ci_errors.txt`
 
 This is iteration 1 of the autonomous loop.
 
-## 🎯 FOCUS MODE (User-Specified)
+## FOCUS MODE (User-Specified)
 
 **The user has specified that you should ONLY work on the following task:**
 
-> implement feature
+> Implement the specs for varun22m on test19.
+
+Work exclusively on this task. When the task is complete, signal TASK_COMPLETE. Do NOT select other tasks from specs.
 
 
-
-Work exclusively on this task. When the task is complete, signal TASK_COMPLETE. Do NOT select other tasks from specs - only do what is specified above.
-
-
-
-## Previous Iteration Errors
-
-**CI checks failed in the previous iteration. You MUST fix these errors.**
-
-Read the error details from: `.ralph-auto/ci_errors.txt`
 
 
 ## Progress So Far
@@ -191,6 +180,15 @@ Read the error details from: `.ralph-auto/ci_errors.txt`
 ```
 # Ralph Auto Progress Log
 # This file tracks autonomous task completions
+
+
+## Iteration 2 - 2026-03-27 16:27
+**Task**: Partial work (no explicit completion signal)
+---
+
+## Iteration 3 - 2026-03-27 16:27
+**Task**: Partial work (no explicit completion signal)
+---
 ```
 
 

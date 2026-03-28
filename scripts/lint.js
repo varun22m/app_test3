@@ -22,9 +22,10 @@ for (const relativePath of files) {
   }
 
   const content = fs.readFileSync(fullPath, "utf8");
-  const lines = content.split("\n");
+  const normalizedContent = content.replace(/\r\n/g, "\n");
+  const lines = normalizedContent.split("\n");
   lines.forEach((line, index) => {
-    if (/\s+$/.test(line)) {
+    if (/[ \t]+$/.test(line)) {
       console.error(`${relativePath}:${index + 1} has trailing whitespace`);
       hasError = true;
     }

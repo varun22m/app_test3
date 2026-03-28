@@ -9,3 +9,8 @@
 ## Iteration 3 - 2026-03-27 16:27
 **Task**: Partial work (no explicit completion signal)
 ---
+
+## Iteration 1 - 2026-03-28 11:08
+**Task**: Fixed Windows CRLF lint handling and added tests
+**Status**: complete
+---
