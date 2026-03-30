@@ -74,10 +74,52 @@ function buildAgentBundles(input, options = {}) {
     assignedTasks: sortAssignedTasks(
       tasks.filter((task) => resolveTaskAgentId(task, defaultAgentId) === agentId)
     ),
-    mentions: sortMentions(
-      mentions.filter((mention) => typeof mention?.agent_id === "string" && mention.agent_id.trim() === agentId)
-    )
-  }));
+      mentions: sortMentions(
+        mentions.filter((mention) => typeof mention?.agent_id === "string" && mention.agent_id.trim() === agentId)
+      )
+    }));
+}
+
+function collectNotificationIds(mentions) {
+  const notificationIds = [];
+  const seenIds = new Set();
+
+  for (const mention of mentions) {
+    if (typeof mention?.id !== "string") {
+      continue;
+    }
+
+    const notificationId = mention.id.trim();
+    if (notificationId === "" || seenIds.has(notificationId)) {
+      continue;
+    }
+
+    seenIds.add(notificationId);
+    notificationIds.push(notificationId);
+  }
+
+  return notificationIds;
+}
+
+function buildDeliveryPlan(bundle) {
+  const assignedTasks = sortAssignedTasks(bundle?.assignedTasks ?? []);
+  const mentions = sortMentions(bundle?.mentions ?? []);
+
+  return {
+    agentId: bundle?.agentId,
+    assignedTasks,
+    mentions,
+    shouldDispatch: assignedTasks.length > 0 || mentions.length > 0,
+    notificationIds: collectNotificationIds(mentions)
+  };
+}
+
+function getDeliveredNotificationIds(deliveryPlan, dispatchSucceeded) {
+  if (!dispatchSucceeded || !deliveryPlan?.shouldDispatch) {
+    return [];
+  }
+
+  return [...deliveryPlan.notificationIds];
 }
 
 function formatContext(context) {
@@ -154,8 +196,11 @@ module.exports = {
   DEFAULT_AGENT_ID,
   PRIORITY_ORDER,
   buildDispatchPrompt,
+  buildDeliveryPlan,
   buildAgentBundles,
+  collectNotificationIds,
   deriveActiveAgents,
+  getDeliveredNotificationIds,
   resolveTaskAgentId,
   sortAssignedTasks,
   sortMentions

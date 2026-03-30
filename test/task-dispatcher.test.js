@@ -2,8 +2,11 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
   buildDispatchPrompt,
+  buildDeliveryPlan,
   buildAgentBundles,
+  collectNotificationIds,
   deriveActiveAgents,
+  getDeliveredNotificationIds,
   resolveTaskAgentId,
   sortAssignedTasks,
   sortMentions
@@ -123,6 +126,101 @@ test("buildAgentBundles groups assigned work and mentions per active agent", () 
   assert.deepEqual(
     bundles.find((bundle) => bundle.agentId === "leo").assignedTasks.map((task) => task.id),
     ["task-2"]
+  );
+});
+
+test("collectNotificationIds keeps unique notification ids in mention order", () => {
+  const notificationIds = collectNotificationIds([
+    { id: " notification-2 " },
+    { id: "notification-1" },
+    { id: "notification-2" },
+    { id: "" },
+    { notAnId: true }
+  ]);
+
+  assert.deepEqual(notificationIds, ["notification-2", "notification-1"]);
+});
+
+test("buildDeliveryPlan sorts bundle work and tracks notification ids for acknowledgement", () => {
+  const deliveryPlan = buildDeliveryPlan({
+    agentId: "maya",
+    assignedTasks: [
+      {
+        id: "task-2",
+        title: "Review search terms",
+        priority: "medium",
+        created_at: "2026-03-22T11:00:00.000Z"
+      },
+      {
+        id: "task-1",
+        title: "Investigate TACoS spike",
+        priority: "urgent",
+        created_at: "2026-03-22T09:00:00.000Z"
+      }
+    ],
+    mentions: [
+      {
+        id: "notification-2",
+        task_title: "Task for maya",
+        from_agent: "clair",
+        content: "@maya please investigate",
+        created_at: "2026-03-22T11:00:00.000Z"
+      },
+      {
+        id: "notification-1",
+        task_title: "Earlier task for maya",
+        from_agent: "leo",
+        content: "@maya please review first",
+        created_at: "2026-03-22T08:00:00.000Z"
+      }
+    ]
+  });
+
+  assert.equal(deliveryPlan.agentId, "maya");
+  assert.equal(deliveryPlan.shouldDispatch, true);
+  assert.deepEqual(
+    deliveryPlan.assignedTasks.map((task) => task.id),
+    ["task-1", "task-2"]
+  );
+  assert.deepEqual(
+    deliveryPlan.mentions.map((mention) => mention.id),
+    ["notification-1", "notification-2"]
+  );
+  assert.deepEqual(
+    deliveryPlan.notificationIds,
+    ["notification-1", "notification-2"]
+  );
+});
+
+test("buildDeliveryPlan skips empty bundles and exposes no notification acknowledgements", () => {
+  const deliveryPlan = buildDeliveryPlan({
+    agentId: "clair",
+    assignedTasks: [],
+    mentions: []
+  });
+
+  assert.equal(deliveryPlan.shouldDispatch, false);
+  assert.deepEqual(deliveryPlan.notificationIds, []);
+});
+
+test("getDeliveredNotificationIds only acknowledges notifications after a successful dispatch", () => {
+  const deliveryPlan = buildDeliveryPlan({
+    agentId: "leo",
+    assignedTasks: [{ id: "task-1", priority: "high", created_at: "2026-03-22T08:00:00.000Z" }],
+    mentions: [
+      { id: "notification-1", created_at: "2026-03-22T09:00:00.000Z" },
+      { id: "notification-2", created_at: "2026-03-22T10:00:00.000Z" }
+    ]
+  });
+
+  assert.deepEqual(getDeliveredNotificationIds(deliveryPlan, true), [
+    "notification-1",
+    "notification-2"
+  ]);
+  assert.deepEqual(getDeliveredNotificationIds(deliveryPlan, false), []);
+  assert.deepEqual(
+    getDeliveredNotificationIds(buildDeliveryPlan({ agentId: "leo", assignedTasks: [], mentions: [] }), true),
+    []
   );
 });
 

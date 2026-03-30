@@ -22,7 +22,10 @@ Use these files as reference when implementing tasks. Read relevant specs before
 
 **Available specs:**
 
-- `specs/actions-page.md`
+- `specs/accounts-specs.md`
+- `specs/actions-specs.md`
+- `specs/backend-specs.md`
+- `specs/task-dispatcher-specs.md`
 
 ## Critical Rules
 
@@ -162,16 +165,13 @@ Before signaling TASK_COMPLETE:
 
 This is iteration 3 of the autonomous loop.
 
-## 🎯 FOCUS MODE (User-Specified)
+## FOCUS MODE (User-Specified)
 
 **The user has specified that you should ONLY work on the following task:**
 
-> implement feature
+> Implement the specs for varun22m on test21.
 
-
-
-Work exclusively on this task. When the task is complete, signal TASK_COMPLETE. Do NOT select other tasks from specs - only do what is specified above.
-
+Work exclusively on this task. When the task is complete, signal TASK_COMPLETE. Do NOT select other tasks from specs.
 
 
 
@@ -185,6 +185,20 @@ Work exclusively on this task. When the task is complete, signal TASK_COMPLETE. 
 
 ## Iteration 2 - 2026-03-27 16:27
 **Task**: Partial work (no explicit completion signal)
+---
+
+## Iteration 3 - 2026-03-27 16:27
+**Task**: Partial work (no explicit completion signal)
+---
+
+## Iteration 1 - 2026-03-30 08:05
+**Task**: Added dispatcher prompt builder with tests
+**Status**: complete
+---
+
+## Iteration 2 - 2026-03-30 08:06
+**Task**: Added dispatcher agent bundling helpers with tests
+**Status**: complete
 ---
 ```
 

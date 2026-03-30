@@ -441,7 +441,7 @@ This workspace is a reduced Node.js harness used to implement the dispatcher spe
 
 - [x] Add a prompt builder module that renders assigned tasks, notes, and mentions into the dispatcher message and applies the agreed priority ordering.
 - [x] Add agent bundling helpers for default clair routing and active-agent derivation.
-- [ ] Add delivery-planning helpers for successful notification acknowledgement after dispatch.
+- [x] Add delivery-planning helpers for successful notification acknowledgement after dispatch.
 
 ---
 
