@@ -4,6 +4,8 @@ const PRIORITY_ORDER = {
   medium: 2,
   low: 3
 };
+const DEFAULT_AGENT_ID = "clair";
+const AGENT_ORDER = ["clair", "maya", "leo", "luca"];
 
 function getPriorityRank(priority) {
   return PRIORITY_ORDER[priority] ?? Number.MAX_SAFE_INTEGER;
@@ -28,6 +30,54 @@ function sortAssignedTasks(tasks) {
 
 function sortMentions(mentions) {
   return [...mentions].sort(compareByCreatedAt);
+}
+
+function resolveTaskAgentId(task, defaultAgentId = DEFAULT_AGENT_ID) {
+  if (typeof task?.agent_id === "string" && task.agent_id.trim() !== "") {
+    return task.agent_id.trim();
+  }
+
+  return defaultAgentId;
+}
+
+function deriveActiveAgents(input, options = {}) {
+  const tasks = Array.isArray(input?.tasks) ? input.tasks : [];
+  const mentions = Array.isArray(input?.mentions) ? input.mentions : [];
+  const defaultAgentId = options.defaultAgentId ?? DEFAULT_AGENT_ID;
+  const orderedAgents = options.agentOrder ?? AGENT_ORDER;
+  const activeAgents = new Set();
+
+  for (const task of tasks) {
+    activeAgents.add(resolveTaskAgentId(task, defaultAgentId));
+  }
+
+  for (const mention of mentions) {
+    if (typeof mention?.agent_id === "string" && mention.agent_id.trim() !== "") {
+      activeAgents.add(mention.agent_id.trim());
+    }
+  }
+
+  const knownAgents = orderedAgents.filter((agentId) => activeAgents.has(agentId));
+  const discoveredAgents = [...activeAgents].filter((agentId) => !orderedAgents.includes(agentId));
+
+  return [...knownAgents, ...discoveredAgents];
+}
+
+function buildAgentBundles(input, options = {}) {
+  const tasks = Array.isArray(input?.tasks) ? input.tasks : [];
+  const mentions = Array.isArray(input?.mentions) ? input.mentions : [];
+  const defaultAgentId = options.defaultAgentId ?? DEFAULT_AGENT_ID;
+  const agentIds = deriveActiveAgents({ tasks, mentions }, options);
+
+  return agentIds.map((agentId) => ({
+    agentId,
+    assignedTasks: sortAssignedTasks(
+      tasks.filter((task) => resolveTaskAgentId(task, defaultAgentId) === agentId)
+    ),
+    mentions: sortMentions(
+      mentions.filter((mention) => typeof mention?.agent_id === "string" && mention.agent_id.trim() === agentId)
+    )
+  }));
 }
 
 function formatContext(context) {
@@ -100,8 +150,13 @@ function buildDispatchPrompt(bundle) {
 }
 
 module.exports = {
+  AGENT_ORDER,
+  DEFAULT_AGENT_ID,
   PRIORITY_ORDER,
   buildDispatchPrompt,
+  buildAgentBundles,
+  deriveActiveAgents,
+  resolveTaskAgentId,
   sortAssignedTasks,
   sortMentions
 };

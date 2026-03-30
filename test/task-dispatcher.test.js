@@ -2,6 +2,9 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
   buildDispatchPrompt,
+  buildAgentBundles,
+  deriveActiveAgents,
+  resolveTaskAgentId,
   sortAssignedTasks,
   sortMentions
 } = require("../src/task-dispatcher");
@@ -43,6 +46,83 @@ test("sortMentions keeps mention delivery order stable by creation time", () => 
   assert.deepEqual(
     sortedMentions.map((mention) => mention.id),
     ["mention-1", "mention-2"]
+  );
+});
+
+test("resolveTaskAgentId routes unowned tasks to clair by default", () => {
+  assert.equal(resolveTaskAgentId({ agent_id: "maya" }), "maya");
+  assert.equal(resolveTaskAgentId({ agent_id: "" }), "clair");
+  assert.equal(resolveTaskAgentId({ agent_id: null }), "clair");
+});
+
+test("deriveActiveAgents collects active agents from tasks and mentions", () => {
+  const activeAgents = deriveActiveAgents({
+    tasks: [
+      { id: "task-1", agent_id: null },
+      { id: "task-2", agent_id: "leo" }
+    ],
+    mentions: [
+      { id: "mention-1", agent_id: "maya" },
+      { id: "mention-2", agent_id: "external-agent" }
+    ]
+  });
+
+  assert.deepEqual(activeAgents, ["clair", "maya", "leo", "external-agent"]);
+});
+
+test("buildAgentBundles groups assigned work and mentions per active agent", () => {
+  const bundles = buildAgentBundles({
+    tasks: [
+      {
+        id: "task-1",
+        title: "Unowned task",
+        priority: "medium",
+        agent_id: null,
+        created_at: "2026-03-22T10:00:00.000Z"
+      },
+      {
+        id: "task-2",
+        title: "Leo task",
+        priority: "urgent",
+        agent_id: "leo",
+        created_at: "2026-03-22T09:00:00.000Z"
+      }
+    ],
+    mentions: [
+      {
+        id: "mention-2",
+        task_title: "Task for leo",
+        agent_id: "leo",
+        from_agent: "clair",
+        content: "@leo please review",
+        created_at: "2026-03-22T11:00:00.000Z"
+      },
+      {
+        id: "mention-1",
+        task_title: "Task for maya",
+        agent_id: "maya",
+        from_agent: "clair",
+        content: "@maya please investigate",
+        created_at: "2026-03-22T08:00:00.000Z"
+      }
+    ]
+  });
+
+  assert.deepEqual(
+    bundles.map((bundle) => bundle.agentId),
+    ["clair", "maya", "leo"]
+  );
+  assert.deepEqual(
+    bundles.find((bundle) => bundle.agentId === "clair").assignedTasks.map((task) => task.id),
+    ["task-1"]
+  );
+  assert.deepEqual(
+    bundles.find((bundle) => bundle.agentId === "maya").mentions.map((mention) => mention.id),
+    ["mention-1"]
+  );
+  assert.deepEqual(
+    bundles.find((bundle) => bundle.agentId === "leo").assignedTasks.map((task) => task.id),
+    ["task-2"]
   );
 });
 

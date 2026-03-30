@@ -440,7 +440,7 @@ The `gateway_url` in the `org_claw` table uses the short-form cluster DNS. All t
 This workspace is a reduced Node.js harness used to implement the dispatcher spec in small, testable slices.
 
 - [x] Add a prompt builder module that renders assigned tasks, notes, and mentions into the dispatcher message and applies the agreed priority ordering.
-- [ ] Add agent bundling helpers for default clair routing and active-agent derivation.
+- [x] Add agent bundling helpers for default clair routing and active-agent derivation.
 - [ ] Add delivery-planning helpers for successful notification acknowledgement after dispatch.
 
 ---

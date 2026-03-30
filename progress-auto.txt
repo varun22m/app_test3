@@ -14,3 +14,8 @@
 **Task**: Added dispatcher prompt builder with tests
 **Status**: complete
 ---
+
+## Iteration 2 - 2026-03-30 08:06
+**Task**: Added dispatcher agent bundling helpers with tests
+**Status**: complete
+---
