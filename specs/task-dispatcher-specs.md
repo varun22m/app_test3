@@ -435,7 +435,17 @@ The `gateway_url` in the `org_claw` table uses the short-form cluster DNS. All t
 
 ---
 
-## 11. OpenClaw Extension Spec — `crew-tasks`
+## 10A. Test21 Implementation Tracker
+
+This workspace is a reduced Node.js harness used to implement the dispatcher spec in small, testable slices.
+
+- [x] Add a prompt builder module that renders assigned tasks, notes, and mentions into the dispatcher message and applies the agreed priority ordering.
+- [ ] Add agent bundling helpers for default clair routing and active-agent derivation.
+- [ ] Add delivery-planning helpers for successful notification acknowledgement after dispatch.
+
+---
+
+## 11. OpenClaw Extension Spec - `crew-tasks`
 
 The `crew-tasks` extension is an OpenClaw plugin installed in every org's pod at `~/.openclaw/extensions/clair/`. It gives agents the tools they need to read their tasks, write activity, update their working memory, and propose actions — all in a single HTTP hop to the crew backend.
 

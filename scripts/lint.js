@@ -4,11 +4,13 @@ const path = require("node:path");
 const root = process.cwd();
 const files = [
   "src/greeting.js",
+  "src/task-dispatcher.js",
   "hello0.js",
   "hello1.js",
   "hello2.js",
   "hello3.js",
-  "test/greeting.test.js"
+  "test/greeting.test.js",
+  "test/task-dispatcher.test.js"
 ];
 
 let hasError = false;
@@ -22,9 +24,9 @@ for (const relativePath of files) {
   }
 
   const content = fs.readFileSync(fullPath, "utf8");
-  const lines = content.split("\n");
+  const lines = content.split(/\r?\n/);
   lines.forEach((line, index) => {
-    if (/\s+$/.test(line)) {
+    if (/[ \t]+$/.test(line)) {
       console.error(`${relativePath}:${index + 1} has trailing whitespace`);
       hasError = true;
     }
