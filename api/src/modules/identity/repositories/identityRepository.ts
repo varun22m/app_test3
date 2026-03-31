@@ -1,3 +1,7 @@
+import {
+  getIdentityDatabase,
+  type IdentityDatabase,
+} from "../../../shared/db/database.js";
 import type {
   OrgMembershipRequestDto,
   OrgMembershipResponseDto,
@@ -7,39 +11,26 @@ import type {
 } from "../types/dtos.js";
 
 export class IdentityRepository {
-  readonly #memberships = new Map<string, OrgMembershipResponseDto>();
-
-  readonly #orgs = new Map<string, OrgResponseDto>();
-
-  readonly #users = new Map<string, SyncUserResponseDto>();
+  constructor(
+    private readonly database: IdentityDatabase = getIdentityDatabase(),
+  ) {}
 
   syncUser(record: SyncUserResponseDto): SyncUserResponseDto {
-    this.#users.set(record.userId, record);
-    return record;
+    return this.database.syncUser(record);
   }
 
   createOrUpdateOrg(input: OrgRequestDto, createdBy: string): OrgResponseDto {
-    const record: OrgResponseDto = {
-      ...input,
-      createdBy,
-    };
-
-    this.#orgs.set(input.id, record);
-    return record;
+    return this.database.createOrUpdateOrg(input, createdBy);
   }
 
   getOrg(orgId: string): OrgResponseDto | null {
-    return this.#orgs.get(orgId) ?? null;
+    return this.database.getOrg(orgId);
   }
 
   syncMembership(
     input: OrgMembershipRequestDto,
   ): OrgMembershipResponseDto {
-    this.#memberships.set(
-      `${input.orgId}:${input.userId}`,
-      input,
-    );
-    return input;
+    return this.database.syncMembership(input);
   }
 }
 
