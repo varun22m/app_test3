@@ -11,3 +11,8 @@
 **Task**: Moved identity persistence into shared db layer
 **Status**: complete
 ---
+
+## Iteration 4 - 2026-03-31 12:38
+**Task**: Added Clerk JWT auth with JWKS verification
+**Status**: complete
+---

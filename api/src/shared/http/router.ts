@@ -34,24 +34,24 @@ export class Router {
   }
 
   async handle(request: IncomingMessage, response: ServerResponse): Promise<void> {
-    const method = (request.method ?? "GET").toUpperCase();
-    const url = new URL(request.url ?? "/", "http://localhost");
-    const route = this.#routes.find(
-      (candidate) =>
-        candidate.method === method && candidate.path === url.pathname,
-    );
-
-    if (!route) {
-      sendJson(response, 404, { error: "Not Found" });
-      return;
-    }
-
-    const context: RequestContext = {
-      auth: resolveAuthContext(request),
-      url,
-    };
-
     try {
+      const method = (request.method ?? "GET").toUpperCase();
+      const url = new URL(request.url ?? "/", "http://localhost");
+      const route = this.#routes.find(
+        (candidate) =>
+          candidate.method === method && candidate.path === url.pathname,
+      );
+
+      if (!route) {
+        sendJson(response, 404, { error: "Not Found" });
+        return;
+      }
+
+      const context: RequestContext = {
+        auth: await resolveAuthContext(request),
+        url,
+      };
+
       await route.handler(request, response, context);
     } catch (error) {
       if (isHttpError(error)) {

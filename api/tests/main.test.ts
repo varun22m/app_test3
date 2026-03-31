@@ -1,7 +1,26 @@
 import assert from "node:assert/strict";
+import { generateKeyPairSync, sign } from "node:crypto";
 import { after, test } from "node:test";
 
-import { createApp } from "../src/main.js";
+const issuer = "https://clerk.test";
+const keyId = "test-key";
+const { privateKey, publicKey } = generateKeyPairSync("rsa", {
+  modulusLength: 2048,
+});
+
+process.env.CLERK_ISSUER = issuer;
+process.env.CLERK_JWKS_JSON = JSON.stringify({
+  keys: [
+    {
+      ...publicKey.export({ format: "jwk" }),
+      alg: "RS256",
+      kid: keyId,
+      use: "sig",
+    },
+  ],
+});
+
+const { createApp } = await import("../src/main.js");
 
 const app = createApp();
 
@@ -50,12 +69,16 @@ test("GET /api/v1/protected requires auth context", async () => {
 });
 
 test("POST /api/v1/orgs and GET /api/v1/orgs/me share identity state", async () => {
+  const token = createSessionToken({
+    org_id: "org_123",
+    sub: "user_123",
+  });
+
   const createResponse = await fetch(`${getBaseUrl()}/api/v1/orgs`, {
     body: JSON.stringify({ id: "org_123", name: "Acme" }),
     headers: {
+      authorization: `Bearer ${token}`,
       "content-type": "application/json",
-      "x-org-id": "org_123",
-      "x-user-id": "user_123",
     },
     method: "POST",
   });
@@ -69,8 +92,7 @@ test("POST /api/v1/orgs and GET /api/v1/orgs/me share identity state", async () 
 
   const readResponse = await fetch(`${getBaseUrl()}/api/v1/orgs/me`, {
     headers: {
-      "x-org-id": "org_123",
-      "x-user-id": "user_123",
+      authorization: `Bearer ${token}`,
     },
   });
 
@@ -81,3 +103,27 @@ test("POST /api/v1/orgs and GET /api/v1/orgs/me share identity state", async () 
     name: "Acme",
   });
 });
+
+function createSessionToken(claims: Record<string, string>): string {
+  const encodedHeader = encodeBase64Url({
+    alg: "RS256",
+    kid: keyId,
+    typ: "JWT",
+  });
+  const encodedPayload = encodeBase64Url({
+    ...claims,
+    exp: Math.floor(Date.now() / 1000) + 60 * 5,
+    iss: issuer,
+  });
+  const signature = sign(
+    "RSA-SHA256",
+    Buffer.from(`${encodedHeader}.${encodedPayload}`),
+    privateKey,
+  );
+
+  return `${encodedHeader}.${encodedPayload}.${signature.toString("base64url")}`;
+}
+
+function encodeBase64Url(value: unknown): string {
+  return Buffer.from(JSON.stringify(value)).toString("base64url");
+}

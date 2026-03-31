@@ -1,4 +1,7 @@
 export interface AppConfig {
+  clerkIssuer: string | null;
+  clerkJwksJson: string | null;
+  clerkJwksUrl: string | null;
   port: number;
 }
 
@@ -10,5 +13,19 @@ export function getConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     throw new Error(`Invalid PORT value: ${rawPort}`);
   }
 
-  return { port };
+  return {
+    clerkIssuer: readOptionalEnv(env.CLERK_ISSUER),
+    clerkJwksJson: readOptionalEnv(env.CLERK_JWKS_JSON),
+    clerkJwksUrl: readOptionalEnv(env.CLERK_JWKS_URL),
+    port,
+  };
+}
+
+function readOptionalEnv(value: string | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+  return trimmedValue.length > 0 ? trimmedValue : null;
 }

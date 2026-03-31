@@ -102,7 +102,7 @@ Move current endpoints into `modules/identity` and `shared`:
 - [x] Scaffold `api/src/main.ts`, shared HTTP utilities, and placeholder module registration in the target modular layout.
 - [x] Implement the phase 1 identity endpoint surface with module-level routes, controllers, services, and in-memory repositories.
 - [x] Replace the temporary in-memory identity repository with shared database access under `shared/db/`.
-- [ ] Replace header-based auth context resolution with Clerk-backed request auth in `shared/auth/`.
+- [x] Replace header-based auth context resolution with Clerk-backed request auth in `shared/auth/`.
 - [ ] Add the remaining accounts and integrations behavior behind their placeholder modules.
 
 ## Acceptance Criteria
