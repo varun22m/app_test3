@@ -1,0 +1,16 @@
+{
+  "name": "test40",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix api run build",
+    "typecheck": "tsc --noEmit -p api/tsconfig.json",
+    "lint": "tsc --noEmit -p api/tsconfig.json",
+    "test": "node --test --import tsx api/tests/main.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.37",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

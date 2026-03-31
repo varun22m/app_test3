@@ -97,6 +97,14 @@ Move current endpoints into `modules/identity` and `shared`:
 6. Add placeholders for `modules/accounts`, `modules/integrations`, `modules/analytics`.
 7. Add shared error handling and request validation utilities.
 
+## Implementation Status
+- [x] Create repository-root `npm` scripts and an `api/` package so build/typecheck/lint/test can run from the repository root.
+- [x] Scaffold `api/src/main.ts`, shared HTTP utilities, and placeholder module registration in the target modular layout.
+- [x] Implement the phase 1 identity endpoint surface with module-level routes, controllers, services, and in-memory repositories.
+- [ ] Replace the temporary in-memory identity repository with shared database access under `shared/db/`.
+- [ ] Replace header-based auth context resolution with Clerk-backed request auth in `shared/auth/`.
+- [ ] Add the remaining accounts and integrations behavior behind their placeholder modules.
+
 ## Acceptance Criteria
 - No behavior changes for existing endpoints.
 - All identity endpoints live under `modules/identity` with clear separation of routing, services, and repositories.
